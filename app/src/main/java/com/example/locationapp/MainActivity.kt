@@ -19,7 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.locationapp.ui.theme.LocationAppTheme
@@ -55,7 +57,12 @@ fun MyApp(viewModel: LocationViewModel){
         viewModel: LocationViewModel,
         context: Context
     ) {
+
         val location = viewModel.location.value
+
+        val address = location?.let {
+            locationUtils.reverseGeocodeLocation(location)
+        }
 
         val requestPermissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -95,8 +102,9 @@ fun MyApp(viewModel: LocationViewModel){
         verticalArrangement = Arrangement.Center) {
 
         if(location!=null){
-            Text(text = "Your Current Address is at")
+            Text(text = "Your Current Address", color = Color.Red)
             Text(text = "Latitude: ${location.latitude} and Longitude: ${location.longitude}")
+            Text(text = "Address: $address", textAlign = TextAlign.Center)
 
         } else {
             Text(text = "Location not available")

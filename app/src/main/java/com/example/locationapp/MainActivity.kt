@@ -55,13 +55,17 @@ fun MyApp(viewModel: LocationViewModel){
         viewModel: LocationViewModel,
         context: Context
     ) {
+        val location = viewModel.location.value
 
         val requestPermissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions(),
             onResult = { permissions ->
                 if(permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
                     && permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true){
+
                     // I have ACCESS to location
+                    locationUtils.requestLocationUpdates(viewModel = viewModel)
+
                 } else {
                     // Ask for permission
                     val rationaleRequired = ActivityCompat.shouldShowRequestPermissionRationale(
@@ -89,10 +93,19 @@ fun MyApp(viewModel: LocationViewModel){
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
-        Text(text = "Location not available")
+
+        if(location!=null){
+            Text(text = "Your Current Address is at")
+            Text(text = "Latitude: ${location.latitude} and Longitude: ${location.longitude}")
+
+        } else {
+            Text(text = "Location not available")
+        }
+
         Button(onClick = {
             if(locationUtils.hasLocationPermission(context)){
                 // Permission already granted update the location
+                locationUtils.requestLocationUpdates(viewModel)
             } else {
                 // Request location permission
                 requestPermissionLauncher.launch(
